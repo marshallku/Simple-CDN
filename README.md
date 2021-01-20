@@ -40,29 +40,21 @@ Place every files in [www](https://github.com/marshall-ku/Simple-CDN/tree/master
 ```PHP
 function imgToPicture($content)
 {
-    preg_match_all('/<img.+?>/', $content, $matches);
+    preg_match_all('/<img(.+?)(src=\"(.+?)\")(.+?)(srcset="(.+?)")? ?\/?>/', $content, $matches);
+    $i = 0;
     foreach ($matches[0] as &$image) {
-        preg_match('/src="(.+?)"/', $image, $src);
-        preg_match('/srcset="(.+?)"/', $image, $srcset);
-        preg_match('/sizes="(.+?)"/', $image, $sizes);
-        preg_match('/alt="(.+?)"/', $image, $alt);
-        preg_match('/class="(.+?)"/', $image, $class);
-
         // Replace domain to cache server domain
         // Replaces https://example.com/img.png to https://img.example.com/img.png
-        $src = $src[1] ? str_replace('//example', '//img.example', $src[1]) : '';
-        $srcset = $srcset[1] ?? '';
+        $src = str_replace('//example', '//img.example', $matches[3][$i]);
+        $srcset = $matches[6][$i] ?? '';
         $srcset = $srcset != '' ? preg_replace('/\/\/example/', '//img.example', $srcset) : '';
 
-        $sizes = $sizes[1] ?? '';
-        $alt = $alt[1] ?? '';
-        $class = $class[1] ?? '';
+        $webpSrcset = $srcset != '' ? preg_replace('/\.(png|jpe?g)/', '.$1.webp', $srcset) : '';
 
-        $webpSrcset = preg_replace('/\.(png|jpe?g)/', '.$1.webp', $srcset);
-
-        $tmp = "<picture><source type=\"image/webp\" srcset=\"{$src}.webp 1x,{$webpSrcset}\" sizes=\"{$sizes}\"></source><source srcset=\"{$src} 1x,{$srcset}\" sizes=\"{$sizes}\"></source><img alt=\"{$alt}\" class=\"{$class}\" src=\"{$src}\" srcset=\"{$srcset}\" sizes=\"{$sizes}\"></picture>";
+        $tmp = "<picture><source type=\"image/webp\" srcset=\"{$src}.webp 1x,{$webpSrcset}\"></source><source srcset=\"{$src} 1x,{$srcset}\"></source><img{$matches[1][$i]}src=\"{$src}\"{$matches[4][$i]}srcset=\"{$srcset}\"></picture>";
 
         $content = str_replace($image, $tmp, $content);
+        $i++;
     }
     return $content;
 }
