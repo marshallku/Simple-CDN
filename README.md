@@ -40,16 +40,30 @@ Place every files in [www](https://github.com/marshall-ku/Simple-CDN/tree/master
 ```PHP
 function imgToPicture($content)
 {
-    $content = preg_replace('/<img(.+?)(src=\"(.+?)\")(.+?)(srcset=\"(.+?)\"?)?>/', '<picture><source type="image/webp" srcset="$3 1x,$6"></source><source srcset="$3 1x,$6\"></source><img$1src="$3"$4srcset="$6"></picture>', $content);
-
-    preg_match_all('/\[##_.*_##\]/', $content, $matches);
+    preg_match_all('/<img.+?>/', $content, $matches);
     foreach ($matches[0] as &$image) {
-        $tmp = preg_replace('/\[?_?##_?\]?/', '', $image);
-        $tmp = preg_replace('/\.(png|jpe?g)/', '.$1.webp', $tmp);
+        preg_match('/src="(.+?)"/', $image, $src);
+        preg_match('/srcset="(.+?)"/', $image, $srcset);
+        preg_match('/sizes="(.+?)"/', $image, $sizes);
+        preg_match('/alt="(.+?)"/', $image, $alt);
+        preg_match('/class="(.+?)"/', $image, $class);
+
+        // Replace domain to cache server domain
+        // Replaces https://example.com/img.png to https://img.example.com/img.png
+        $src = $src[1] ? str_replace('//example', '//img.example', $src[1]) : '';
+        $srcset = $srcset[1] ?? '';
+        $srcset = $srcset != '' ? preg_replace('/\/\/example/', '//img.example', $srcset) : '';
+
+        $sizes = $sizes[1] ?? '';
+        $alt = $alt[1] ?? '';
+        $class = $class[1] ?? '';
+
+        $webpSrcset = preg_replace('/\.(png|jpe?g)/', '.$1.webp', $srcset);
+
+        $tmp = "<picture><source type=\"image/webp\" srcset=\"{$src}.webp 1x,{$webpSrcset}\" sizes=\"{$sizes}\"></source><source srcset=\"{$src} 1x,{$srcset}\" sizes=\"{$sizes}\"></source><img alt=\"{$alt}\" class=\"{$class}\" src=\"{$src}\" srcset=\"{$srcset}\" sizes=\"{$sizes}\"></picture>";
 
         $content = str_replace($image, $tmp, $content);
     }
-
     return $content;
 }
 
