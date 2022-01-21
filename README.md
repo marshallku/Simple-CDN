@@ -1,7 +1,7 @@
 # Create your own cache server
 
 Base : [https://blog.lael.be/post/7605](https://blog.lael.be/post/7605)\
-Blog post : [https://marshall-ku.com/web/tips/캐시-서버-구축하기](https://marshall-ku.com/web/tips/캐시-서버-구축하기)
+Blog post : [https://marshallku.com/web/tips/캐시-서버-구축하기](https://marshallku.com/web/tips/캐시-서버-구축하기)
 
 ## Features
 
@@ -20,7 +20,7 @@ You should update both nginx.conf and index.php.
 
 ### Create Nginx configuration file
 
-Create your own nginx configuration file with [nginx.conf](https://github.com/marshall-ku/Simple-CDN/blob/master/nginx/nginx.conf) file in `/etc/nginx/sites-available`
+Create your own nginx configuration file with [nginx.conf](https://github.com/marshallku/Simple-CDN/blob/master/nginx/nginx.conf) file in `/etc/nginx/sites-available`
 
     sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
 
@@ -28,7 +28,7 @@ and link that file in `/etc/nginx/sites-available`
 
 ### Add files in web root folder
 
-Place every files in [www](https://github.com/marshall-ku/Simple-CDN/tree/master/www) folder in `/home/cdn/www`
+Place every files in [www](https://github.com/marshallku/Simple-CDN/tree/master/www) folder in `/home/cdn/www`
 
 ### Restart Nginx, PHP-fpm
 
